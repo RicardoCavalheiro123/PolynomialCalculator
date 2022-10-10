@@ -17,6 +17,7 @@ varToString [] = ""
 varToString ((v, 1): xs) = [v] ++ varToString xs
 varToString ((v, p): xs) = [v] ++ "^" ++ show p ++ varToString xs
 
+
 {- monomialToString -}
 monomialToString :: Monomial -> String
 monomialToString (c, []) = show c
@@ -29,6 +30,7 @@ polynomialToString [] = ""
 polynomialToString ((c, xs):[]) = monomialToString (c, xs)
 polynomialToString ((c, xs):ys) = monomialToString (c, xs) ++ " + " ++ polynomialToString ys
 
+
 {- stringToVarPower -}
 stringToVarPower :: String -> [(Var, Power)]
 stringToVarPower [] = []
@@ -40,9 +42,11 @@ stringToVarPower (x:y:xs) = if y == '^' then (x, head (map digitToInt (take 1 xs
 stringToMonomial :: String -> Monomial
 stringToMonomial s = (head (map digitToInt (take 1 s)), stringToVarPower (drop 1 s))
 
+
 {- stringToPolynomial -}
 stringToPolynomial :: String -> Polynomial
 stringToPolynomial s = map stringToMonomial (S.splitOn " + " s)
+
 
 {- normalizePolynomial -}
 normalizePolynomial :: Polynomial -> Polynomial

@@ -45,6 +45,19 @@ stringToMonomial s = (head (map digitToInt (take 1 s)), stringToVarPower (drop 1
 stringToPolynomial :: String -> Polynomial
 stringToPolynomial s = map stringToMonomial (S.splitOn " + " s)
 
-{- addPolynomial -}
+{- normalizePolynomial -}
+normalizePolynomial :: Polynomial -> Polynomial
+normalizePolynomial p = p
 
 
+{- multiplyPolynomial -}
+multiplyMonPol :: Monomial -> Polynomial -> Polynomial
+multiplyMonPol _ [] = []
+multiplyMonPol (c1, xs1) ((c2, xs2):ys) = (c1 * c2, xs1 ++ xs2) : multiplyMonPol (c1, xs1) ys
+
+multiplyPolPol :: Polynomial -> Polynomial -> Polynomial
+multiplyPolPol [] _ = []
+multiplyPolPol (x:xs) ys = multiplyMonPol x ys ++ multiplyPolPol xs ys
+
+multiplyPolynomial :: Polynomial -> Polynomial -> Polynomial
+multiplyPolynomial p1 p2 = normalizePolynomial (multiplyPolPol p1 p2)

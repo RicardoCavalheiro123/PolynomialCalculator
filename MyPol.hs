@@ -97,12 +97,12 @@ addPower x (y:ys) | (fst x == fst y) = (fst x, snd x + snd y) : ys
 
 addPowers :: [(Var, Power)] -> [(Var, Power)] -> [(Var, Power)]
 addPowers [] y = y
-addPowers (x:xs) y = if checkPower then addPowers xs (addPower x y) else addPowers xs x:y
+addPowers (x:xs) y = if checkPower x y then addPowers xs (addPower x y) else addPowers xs (x:y)
 
 
 multiplyMonPol :: Monomial -> Polynomial -> Polynomial
 multiplyMonPol _ [] = []
-multiplyMonPol (c1, xs1) ((c2, xs2):ys) = (c1 * c2, (addPowers xs1 xs2) : multiplyMonPol (c1, xs1) ys
+multiplyMonPol (c1, xs1) ((c2, xs2):ys) = (c1 * c2, addPowers xs1 xs2) : multiplyMonPol (c1, xs1) ys
 
 multiplyPolPol :: Polynomial -> Polynomial -> Polynomial
 multiplyPolPol [] _ = []

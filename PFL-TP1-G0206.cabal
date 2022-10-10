@@ -26,7 +26,7 @@ library
 
 executable PFL-TP1-G0206
   main-is:             Main.hs
-  other-modules:       MyLib
+  other-modules:       MyLib MyPol
   -- other-extensions:
   build-depends:       base ^>=4.13.0.0, PFL-TP1-G0206
   -- hs-source-dirs:

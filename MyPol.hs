@@ -10,19 +10,34 @@ type Var = Char
 type Monomial = (Coef, [(Var, Power)])
 type Polynomial = [Monomial]
 
+{- varToString -}
+varToString :: [(Var, Power)] -> String
+varToString [] = ""
+varToString ((v, 1): xs) = [v] ++ varToString xs
+varToString ((v, p): xs) = [v] ++ "^" ++ show p ++ varToString xs
+
+{- monomialToString -}
+monomialToString :: Monomial -> String
+monomialToString (c, []) = show c
+monomialToString (c, xs) = show c ++ varToString xs
+
+
 {- polynomialToString -}
 polynomialToString :: Polynomial -> String
 polynomialToString [] = ""
-polynomialToString ((c, []):xs) = show c ++ polynomialToString xs
-polynomialToString ((c, xs):[]) = show c ++ show xs ++ polynomialToString []
-polynomialToString ((c, xs):ys) = show c ++ show xs ++ " + " ++ polynomialToString ys
+polynomialToString ((c, xs):[]) = monomialToString (c, xs)
+polynomialToString ((c, xs):ys) = monomialToString (c, xs) ++ " + " ++ polynomialToString ys
 
-{- stringToPolynomial 
--}
+{- stringToPolynomial -}
 stringToPolynomial :: String -> Polynomial
 stringToPolynomial s = map stringToMonomial (S.splitOn " + " s)
 
-{- stringToMonomial
--}
-stringToMonomial :: String -> Monomial
-stringToMonomial s = 
+{- stringToVariable -}
+stringToVariable :: String -> [(Var, Power)]
+stringToVariable [] = []
+stringToVariable (x:[]) = [(x, 1)]
+
+
+
+
+

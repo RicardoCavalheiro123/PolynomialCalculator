@@ -2,6 +2,7 @@ module MyPol where
 
 import Data.List.Split as S
 import qualified Data.Text as T
+import Data.Char(digitToInt)
 
 type Coef = Int
 type Power = Int
@@ -28,16 +29,22 @@ polynomialToString [] = ""
 polynomialToString ((c, xs):[]) = monomialToString (c, xs)
 polynomialToString ((c, xs):ys) = monomialToString (c, xs) ++ " + " ++ polynomialToString ys
 
+
+{- stringToVarPower -}
+stringToVarPower :: String -> [(Var, Power)]
+stringToVarPower [] = []
+stringToVarPower (x:[]) = [(x, 1)]
+stringToVarPower (x:y:xs) = if y == '^' then (x, head (map digitToInt (take 1 xs)) :: Power) : stringToVarPower (drop 1 xs) else (x, 1) : stringToVarPower (y : xs)
+
+
+{- stringToMonomial  (Coef , [(Var, Power)]) -}
+stringToMonomial :: String -> Monomial
+stringToMonomial s = (head (map digitToInt (take 1 s)), stringToVarPower (drop 1 s))
+
 {- stringToPolynomial -}
 stringToPolynomial :: String -> Polynomial
 stringToPolynomial s = map stringToMonomial (S.splitOn " + " s)
 
-{- stringToVariable -}
-stringToVariable :: String -> [(Var, Power)]
-stringToVariable [] = []
-stringToVariable (x:[]) = [(x, 1)]
-
-
-
+{- addPolynomial -}
 
 

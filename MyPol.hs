@@ -29,7 +29,6 @@ polynomialToString [] = ""
 polynomialToString ((c, xs):[]) = monomialToString (c, xs)
 polynomialToString ((c, xs):ys) = monomialToString (c, xs) ++ " + " ++ polynomialToString ys
 
-
 {- stringToVarPower -}
 stringToVarPower :: String -> [(Var, Power)]
 stringToVarPower [] = []
@@ -48,6 +47,37 @@ stringToPolynomial s = map stringToMonomial (S.splitOn " + " s)
 {- normalizePolynomial -}
 normalizePolynomial :: Polynomial -> Polynomial
 normalizePolynomial p = p
+
+
+{- addPolynomials -}
+addPolynomial :: Polynomial -> Polynomial -> Polynomial
+addPolynomial x y = addPolynomial x y ++ [d | d <- y, notElement d x]
+
+{-add Polynomial -}
+--2xy + 3x + 4y + 5  ------ 2x + 3
+--[(2,[('x', 1),('y', 1)]), (3,[('x', 1)]), (4,[('y', 1)]), (5,[]),] [(2,[('x', 1)]), (3,[])]
+addPolynomial2 :: Polynomial -> Polynomial -> Polynomial
+addPolynomial2 [] y = []
+addPolynomial2 (x:xs) ys = [findEqualMon x ys] ++ addPolynomial xs ys
+
+{- stringToMonomial -}
+-- (3,[('x', 1)])  ------   [(2,[('x', 1)]), (3,[('',0)])]
+findEqualMon :: Monomial -> Polynomial-> Monomial
+findEqualMon x [] = x
+findEqualMon x (y:ys)| (varsOfMonomio x == varsOfMonomio y) = (coefOfMonomio x + coefOfMonomio y, varsOfMonomio x)
+                    | otherwise = findEqualMon x ys
+
+coefOfMonomio :: Monomial -> Int
+coefOfMonomio (x, y) = x
+
+varsOfMonomio :: Monomial -> [(Var, Power)]
+varsOfMonomio (x, y) = y
+
+notElement :: Monomial -> Polynomial -> Bool
+notElement x [] = True
+notElement x (y:ys) | (varsOfMonomio x == varsOfMonomio y) = False
+                 | otherwise = notElement x ys
+
 
 
 {- multiplyPolynomial -}

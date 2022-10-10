@@ -1,18 +1,10 @@
-import Data.List.Split as S
-import qualified Data.Text as T
 
 
-type Monomio = (Int, [(Char, Char)])
-type Polinomio = [Monomio]
-
-listToTuple :: [a] -> (a,a,a)
-listToTuple [x,y,z] = (x,y,z)
-
-listToTuple2 :: [a] -> (a,a)
-listToTuple2 [x,y] = (x,y)
-
-polinomios ::  IO()
-polinomios = do
+    
+{- main
+-}
+main ::  IO()
+main = do
     putStrLn "Deseja:"
     putStrLn "1.normalizar polinómios"
     putStrLn "2.adicionar polinómios"
@@ -27,7 +19,7 @@ polinomios = do
                 
                 print (S.splitOn "+" pol)
                 
-    else if opçao == "2" 
+    else if opçao == "2"
         then putStrLn opçao
     else if opçao == "3" 
         then putStrLn opçao
@@ -35,37 +27,55 @@ polinomios = do
         then putStrLn opçao
     else putStrLn "Wrong number"
 
-{-Normalizar monomio em tuplo 
-Ex. 2x -> (2,x,1)
-    2xy^2
+{- monomial 
 -}
-normalizarMonomio :: String -> Monomio
-normalizarMonomio monomio = (coeficiente, variaveis)
-    where
-        coeficiente = read (takeWhile (/= 'x') monomio) :: Int
-        variaveis = map listToTuple2 (S.splitOn "x" (dropWhile (/= 'x') monomio))
+type Monomial = (Int, [(Char, Int)])
 
-{-Normalizar polinómio em lista de tuplos
-Ex. 2x + 3xy^2 -> [(2,x,1),(3,x,2)]
+{- polynomial
 -}
-normalizarPolinomio :: String -> Polinomio
-normalizarPolinomio polinomio = map normalizarMonomio (S.splitOn "+" polinomio)
-    
-{-Adicionar polinómios
-Ex. 2x + 3xy^2 + 4x^2y + 5x^2y^2 + 6x^2y^3 + 7x^3y^3 + 8x^3y^4
-2x + 3xy^2 + 4x^2y + 5x^2y^2 + 6x^2y^3 + 7x^3y^3 + 8x^3y^4
--}
-adicionarPolinomios :: Polinomio -> Polinomio -> Polinomio
-adicionarPolinomios polinomio1 polinomio2 = polinomio1 ++ polinomio2
+type Polynomial = [Monomial]
 
-{-Multiplicar polinómios
-Ex. 2x + 3xy^2 + 4x^2y + 5x^2y^2 + 6x^2y^3 + 7x^3y^3 + 8x^3y^4
-2x + 3xy^2 + 4x^2y + 5x^2y^2 + 6x^2y^3 + 7x^3y^3 + 8x^3y^4
+{- polynomialToString
 -}
-multiplicarPolinomios :: Polinomio -> Polinomio -> Polinomio
-multiplicarPolinomios polinomio1 polinomio2 = polinomio1 ++ polinomio2
+polynomialToString :: Polynomial -> String
+polynomialToString [] = ""
+polynomialToString ((c, []):xs) = show c ++ polynomialToString xs
+polynomialToString ((c, xs):[]) = show c ++ show xs ++ polynomialToString []
+polynomialToString ((c, xs):ys) = show c ++ show xs ++ " + " ++ polynomialToString ys
 
-{-Calcular a derivada de um polinómio
-Ex. 2x + 3xy^2 + 4x^2y + 5x^2y^2 + 6x^2y^3 + 7x^3y^3 + 8x^3y^4
-2x + 3xy^2 + 4x^2y + 5x^2y^2 + 6x^2y^3 + 7x^3y^3 + 8x^3y^4
+{- stringToPolynomial
 -}
+stringToPolynomial :: String -> Polynomial
+stringToPolynomial s = map stringToMonomial (S.splitOn " + " s)
+
+{- stringToMonomial
+-}
+stringToMonomial :: String -> Monomial
+stringToMonomial s = (read (T.unpack (T.takeWhile (/= '*') (T.pack s))) :: Int, stringToVariable (T.unpack (T.drop 1 (T.dropWhile (/= '*') (T.pack s)))))
+
+{- stringToVariable
+-}
+stringToVariable :: String -> [(Char, Int)]
+stringToVariable [] = []
+stringToVariable (x:[]) = [(x, 1)]
+stringToVariable (x:xs) = if x == '^' then (head xs, read (tail xs) :: Int) : stringToVariable [] else (x, 1) : stringToVariable xs
+
+{- add polynomial
+-}
+addPolynomial :: Polynomial -> Polynomial -> Polynomial
+addPolynomial p1 p2 = p1 ++ p2
+
+{- multiply polynomial
+-}
+multiplyPolynomial :: Polynomial -> Polynomial -> Polynomial
+multiplyPolynomial p1 p2 = p1 ++ p2
+
+{- derivative polynomial
+-}
+derivativePolynomial :: Polynomial -> Polynomial
+derivativePolynomial p = p
+
+{- normalize polynomial
+-}
+normalizePolynomial :: Polynomial -> Polynomial
+normalizePolynomial p = p

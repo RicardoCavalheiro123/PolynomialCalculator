@@ -9,6 +9,7 @@ type Var = Char
 
 type Monomial = (Coef, [(Var, Power)])
 type Polynomial = [Monomial]
+type Operation = Char
 
 {- varToString -}
 varToString :: [(Var, Power)] -> String
@@ -20,6 +21,7 @@ varToString ((v, p): xs) = [v] ++ "^" ++ show p ++ varToString xs
 {- monomialToString -}
 monomialToString :: Monomial -> String
 monomialToString (c, []) = show c
+monomialToString (1, xs) = varToString xs
 monomialToString (c, xs) = show c ++ varToString xs
 
 
@@ -39,12 +41,23 @@ stringToVarPower (x:y:xs) = if y == '^' then (x, head (map digitToInt (take 1 xs
 
 {- stringToMonomial  (Coef , [(Var, Power)]) -}
 stringToMonomial :: String -> Monomial
-stringToMonomial s = (read (takeWhile isDigit s)::Int, stringToVarPower (dropWhile isDigit s))
+stringToMonomial s | isDigit (head s) = (read (takeWhile isDigit s)::Int, stringToVarPower (dropWhile isDigit s))
+                   | isLetter (head s) = (1, stringToVarPower (s))
+                   | otherwise = ((0, [(head s, 0)]) )
 
+terms :: [String] -> [String]
+terms [] = []
+terms [x] = [x]
+terms (x:y:xs) = x : terms xs
+
+opperations :: [String] -> [String]
+opperations [] = []
+opperations [x] = []
+opperations (x:y:xs) = y : opperations xs
 
 {- stringToPolynomial -}
 stringToPolynomial :: String -> Polynomial
-stringToPolynomial s = map stringToMonomial (words s)
+stringToPolynomial s = map stringToMonomial (terms (words s))
 
 
 {- normalizePolynomial -}
@@ -97,7 +110,6 @@ addPower x (y:ys) | (fst x == fst y) = (fst x, snd x + snd y) : ys
 addPowers :: [(Var, Power)] -> [(Var, Power)] -> [(Var, Power)]
 addPowers [] y = y
 addPowers (x:xs) y = if checkPower x y then addPowers xs (addPower x y) else addPowers xs (x:y)
-
 
 multiplyMonPol :: Monomial -> Polynomial -> Polynomial
 multiplyMonPol _ [] = []

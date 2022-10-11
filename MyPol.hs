@@ -11,40 +11,7 @@ type Monomial = (Coef, [(Var, Power)])
 type Polynomial = [Monomial]
 type Operation = Char
 
-{- varToString -}
-varToString :: [(Var, Power)] -> String
-varToString [] = ""
-varToString ((v, 1): xs) = [v] ++ varToString xs
-varToString ((v, p): xs) = [v] ++ "^" ++ show p ++ varToString xs
-
-
-{- monomialToString -}
-monomialToString :: Monomial -> String
-monomialToString (c, []) = show c
-monomialToString (1, xs) = varToString xs
-monomialToString (c, xs) = show c ++ varToString xs
-
-
-{- polynomialToString -}
-polynomialToString :: Polynomial -> String
-polynomialToString [] = ""
-polynomialToString ((c, xs):[]) = monomialToString (c, xs)
-polynomialToString ((c, xs):ys) = monomialToString (c, xs) ++ " + " ++ polynomialToString ys
-
-
-{- stringToVarPower -}
-stringToVarPower :: String -> [(Var, Power)]
-stringToVarPower [] = []
-stringToVarPower (x:[]) = [(x, 1)]
-stringToVarPower (x:y:xs) = if y == '^' then (x, head (map digitToInt (take 1 xs)) :: Power) : stringToVarPower (drop 1 xs) else (x, 1) : stringToVarPower (y : xs)
-
-
-{- stringToMonomial  (Coef , [(Var, Power)]) -}
-stringToMonomial :: String -> Monomial
-stringToMonomial s | isDigit (head s) = (read (takeWhile isDigit s)::Int, stringToVarPower (dropWhile isDigit s))
-                   | isLetter (head s) = (1, stringToVarPower (s))
-                   | otherwise = ((0, [(head s, 0)]) )
-
+{- terms & ops -}
 terms :: [String] -> [String]
 terms [] = []
 terms [x] = [x]
@@ -55,7 +22,46 @@ opperations [] = []
 opperations [x] = []
 opperations (x:y:xs) = y : opperations xs
 
-{- stringToPolynomial -}
+{- Get coeficients and variables -}
+
+coefOfMonomio :: Monomial -> Int
+coefOfMonomio (x, y) = x
+
+varsOfMonomio :: Monomial -> [(Var, Power)]
+varsOfMonomio (x, y) = y
+
+
+{- output -}
+varToString :: [(Var, Power)] -> String
+varToString [] = ""
+varToString ((v, 1): xs) = [v] ++ varToString xs
+varToString ((v, p): xs) = [v] ++ "^" ++ show p ++ varToString xs
+
+
+monomialToString :: Monomial -> String
+monomialToString (c, []) = show c
+monomialToString (1, xs) = varToString xs
+monomialToString (c, xs) = show c ++ varToString xs
+
+
+polynomialToString :: Polynomial -> String
+polynomialToString [] = ""
+polynomialToString ((c, xs):[]) = monomialToString (c, xs)
+polynomialToString ((c, xs):ys) = monomialToString (c, xs) ++ " + " ++ polynomialToString ys
+
+
+{- input -}
+stringToVarPower :: String -> [(Var, Power)]
+stringToVarPower [] = []
+stringToVarPower (x:[]) = [(x, 1)]
+stringToVarPower (x:y:xs) = if y == '^' then (x, head (map digitToInt (take 1 xs)) :: Power) : stringToVarPower (drop 1 xs) else (x, 1) : stringToVarPower (y : xs)
+
+
+stringToMonomial :: String -> Monomial
+stringToMonomial s | isDigit (head s) = (read (takeWhile isDigit s)::Int, stringToVarPower (dropWhile isDigit s))
+                   | isLetter (head s) = (1, stringToVarPower (s))
+                   | otherwise = ((0, [(head s, 0)]) )
+
 stringToPolynomial :: String -> Polynomial
 stringToPolynomial s = map stringToMonomial (terms (words s))
 
@@ -76,18 +82,12 @@ addPolynomial2 :: Polynomial -> Polynomial -> Polynomial
 addPolynomial2 [] y = []
 addPolynomial2 (x:xs) ys = [findEqualMon x ys] ++ addPolynomial2 xs ys
 
-{- stringToMonomial -}
+
 -- (3,[('x', 1)])  ------   [(2,[('x', 1)]), (3,[('',0)])]
 findEqualMon :: Monomial -> Polynomial-> Monomial
 findEqualMon x [] = x
 findEqualMon x (y:ys)| (varsOfMonomio x == varsOfMonomio y) = (coefOfMonomio x + coefOfMonomio y, varsOfMonomio x)
                     | otherwise = findEqualMon x ys
-
-coefOfMonomio :: Monomial -> Int
-coefOfMonomio (x, y) = x
-
-varsOfMonomio :: Monomial -> [(Var, Power)]
-varsOfMonomio (x, y) = y
 
 notElement :: Monomial -> Polynomial -> Bool
 notElement x [] = True
@@ -121,3 +121,14 @@ multiplyPolPol (x:xs) ys = multiplyMonPol x ys ++ multiplyPolPol xs ys
 
 multiplyPolynomial :: Polynomial -> Polynomial -> Polynomial
 multiplyPolynomial p1 p2 = normalizePolynomial (multiplyPolPol p1 p2)
+
+{- derivativePolynomial (Coef, [(Var, Power)]) -}
+
+derivativeMonomial :: Monomial -> Monomial
+derivativeMonomial (c, []) = (0, [])
+derivativeMonomial (c, xs) | snd (head xs) == 1 = (c * snd (head xs), tail xs)
+                           | otherwise = (c * snd (head xs), (fst (head xs), snd (head xs) - 1) : tail xs)
+
+derivativePolynomial :: Polynomial -> Polynomial
+derivativePolynomial [] = []
+derivativePolynomial ((c, xs):ys) = derivativeMonomial (c, xs) : derivativePolynomial ys

@@ -44,16 +44,16 @@ jointSignals (x:y:xs) | x == "+" = jointSignals (y:xs)
                       | x == "-" = jointSignals (("-"++y):xs)
                       | otherwise = x : jointSignals (y:xs)
 
-stringToVarPower :: String -> [(Var, Power)]
-stringToVarPower [] = []
-stringToVarPower [x] = [(x, 1)]
-stringToVarPower (x:y:xs) = if y == '^' then (x, head (map digitToInt (take 1 xs)) :: Power) : stringToVarPower (drop 1 xs) else (x, 1) : stringToVarPower (y : xs)
+stringToExp :: String -> [(Var, Power)]
+stringToExp [] = []
+stringToExp [x] = [(x, 1)]
+stringToExp (x:y:xs) = if y == '^' then (x, head (map digitToInt (take 1 xs)) :: Power) : stringToExp (drop 1 xs) else (x, 1) : stringToExp (y : xs)
 
 
 stringToMonomial :: String -> Monomial
-stringToMonomial s | isDigit (head s) = (read (takeWhile isDigit s)::Int, stringToVarPower (dropWhile isDigit s))
-                   | isLetter (head s) = (1, stringToVarPower s)
-                   | otherwise = (0, [(head s, 0)])
+stringToMonomial s | isDigit (head s) = (read (takeWhile isDigit s)::Int, stringToExp (dropWhile isDigit s))
+                   | isLetter (head s) = (1, stringToExp s)
+                   | otherwise = (-1 * read (takeWhile isDigit (tail s))::Int, stringToExp (dropWhile isDigit (tail s)))
 
 stringToPolynomial :: String -> Polynomial
 stringToPolynomial s = map stringToMonomial (jointSignals (if head v == "" then tail v else v))
@@ -75,7 +75,8 @@ monomialToString (c, xs) = show c ++ varToString xs
 polynomialToString :: Polynomial -> String
 polynomialToString [] = ""
 polynomialToString [(c, xs)] = monomialToString (c, xs)
-polynomialToString ((c, xs):ys) = monomialToString (c, xs) ++ " + " ++ polynomialToString ys
+polynomialToString ((c, xs):(k, zs):ys) = monomialToString (c, xs) ++ (if k<0 then " - " else " + ") ++ polynomialToString ((abs k, zs):ys)
+                                
 
 
 {- normalizePolynomial -}
@@ -84,8 +85,10 @@ normalizePolynomial p = p
 
 
 {- addPolynomials -}
-addPolynomial :: Polynomial -> Polynomial -> Polynomial
-addPolynomial x y = addPolynomial2 x y ++ [d | d <- y, notElement d x]
+addPolynomial :: String -> String -> String
+addPolynomial x y = polynomialToString (addPolynomial2 p1 p2 ++ [d | d <- p2, notElement d p1])
+                        where p1 = stringToPolynomial x
+                              p2 = stringToPolynomial y
 
 {-add Polynomial -}
 --2xy + 3x + 4y + 5  ------ 2x + 3
@@ -131,8 +134,8 @@ multiplyPolPol :: Polynomial -> Polynomial -> Polynomial
 multiplyPolPol [] _ = []
 multiplyPolPol (x:xs) ys = multiplyMonPol x ys ++ multiplyPolPol xs ys
 
-multiplyPolynomial :: Polynomial -> Polynomial -> Polynomial
-multiplyPolynomial p1 p2 = normalizePolynomial (multiplyPolPol p1 p2)
+multiplyPolynomial :: String -> String -> String
+multiplyPolynomial p1 p2 = polynomialToString (normalizePolynomial (multiplyPolPol (stringToPolynomial p1) (stringToPolynomial p2)))
 
 {- derivativePolynomial (Coef, [(Var, Power)]) -}
 
@@ -144,3 +147,9 @@ derivativeMonomial (c, xs) | snd (head xs) == 1 = (c * snd (head xs), tail xs)
 derivativePolynomial :: Polynomial -> Polynomial
 derivativePolynomial [] = []
 derivativePolynomial ((c, xs):ys) = derivativeMonomial (c, xs) : derivativePolynomial ys
+
+{- derivative e.g. d/dx (x^2 + 2x + 1) = 2x + 2 -}
+derivative :: String -> String
+derivative s = polynomialToString (derivativePolynomial (stringToPolynomial s))
+
+

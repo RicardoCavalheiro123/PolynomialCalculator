@@ -1,6 +1,5 @@
 module Main where
 
-import qualified MyLib
 import qualified MyPol
 
 main :: IO ()

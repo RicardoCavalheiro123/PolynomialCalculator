@@ -1,8 +1,7 @@
 module MyPol where
 
-import Data.List.Split as S
 import qualified Data.Text as T
-import Data.Char(digitToInt)
+import Data.Char
 
 type Coef = Int
 type Power = Int
@@ -40,12 +39,12 @@ stringToVarPower (x:y:xs) = if y == '^' then (x, head (map digitToInt (take 1 xs
 
 {- stringToMonomial  (Coef , [(Var, Power)]) -}
 stringToMonomial :: String -> Monomial
-stringToMonomial s = (head (map digitToInt (take 1 s)), stringToVarPower (drop 1 s))
+stringToMonomial s = (read (takeWhile isDigit s)::Int, stringToVarPower (dropWhile isDigit s))
 
 
 {- stringToPolynomial -}
 stringToPolynomial :: String -> Polynomial
-stringToPolynomial s = map stringToMonomial (S.splitOn " + " s)
+stringToPolynomial s = map stringToMonomial (words s)
 
 
 {- normalizePolynomial -}

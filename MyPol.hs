@@ -68,7 +68,14 @@ stringToPolynomial s = map stringToMonomial (terms (words s))
 
 {- normalizePolynomial -}
 normalizePolynomial :: Polynomial -> Polynomial
-normalizePolynomial p = p
+normalizePolynomial [] = []
+normalizePolynomial (x:xs) = [(sumOfEqualMon x xs, varsOfMonomio x)] ++ normalizePolynomial (filterList x xs)
+
+filterList :: Monomial -> Polynomial -> Polynomial
+filterList _ [] = []
+filterList (c, xs) ((c1, xs1):ys) | xs == xs1 = filterList (c, xs) ys
+                                  | otherwise = (c1, xs1) : filterList (c, xs) ys
+
 
 
 {- addPolynomials -}
@@ -88,6 +95,12 @@ findEqualMon :: Monomial -> Polynomial-> Monomial
 findEqualMon x [] = x
 findEqualMon x (y:ys)| (varsOfMonomio x == varsOfMonomio y) = (coefOfMonomio x + coefOfMonomio y, varsOfMonomio x)
                     | otherwise = findEqualMon x ys
+
+                    -- (3,[('x', 1)])  ------   [(2,[('x', 1)]), (3,[('',0)])]
+sumOfEqualMon :: Monomial -> Polynomial-> Int
+sumOfEqualMon x [] = coefOfMonomio x
+sumOfEqualMon x (y:ys)| (varsOfMonomio x == varsOfMonomio y) = coefOfMonomio y + sumOfEqualMon x ys
+                    | otherwise = sumOfEqualMon x ys
 
 notElement :: Monomial -> Polynomial -> Bool
 notElement x [] = True

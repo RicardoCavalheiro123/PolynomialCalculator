@@ -1,6 +1,5 @@
 module Main where
 
-import qualified MyLib
 import qualified MyPol
 
 main :: IO ()
@@ -20,13 +19,13 @@ main = do
       polinómio1 <- getLine
       putStrLn "Insira o segundo polinómio"
       polinómio2 <- getLine
-      putStrLn (MyPol.polynomialToString (MyPol.addPolynomial (MyPol.stringToPolynomial polinómio1) (MyPol.stringToPolynomial polinómio2)))
+      putStrLn (MyPol.addPolynomial polinómio1 polinómio2)
     else if opçao == "3" then do
       putStrLn "Insira o primeiro polinómio"
       polinómio1 <- getLine
       putStrLn "Insira o segundo polinómio"
       polinómio2 <- getLine
-      putStrLn (MyPol.polynomialToString (MyPol.multiplyPolynomial (MyPol.stringToPolynomial polinómio1) (MyPol.stringToPolynomial polinómio2)))
+      putStrLn (MyPol.multiplyPolynomial polinómio1 polinómio2)
     else if opçao == "4" then do
       putStrLn "Insira o polinómio"
       polinómio <- getLine

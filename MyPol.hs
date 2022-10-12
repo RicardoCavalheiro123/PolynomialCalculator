@@ -82,7 +82,10 @@ polynomialToString ((c, xs):(k, zs):ys) = monomialToString (c, xs) ++ (if k<0 th
 {- normalizePolynomial -}
 normalizePolynomial :: Polynomial -> Polynomial
 normalizePolynomial [] = []
-normalizePolynomial (x:xs) = [(sumOfEqualMon x xs, varsOfMonomio x)] ++ normalizePolynomial (filterList x xs)
+normalizePolynomial (x:xs) = (sumOfEqualMon x xs, varsOfMonomio x) : normalizePolynomial (filterList x xs)
+
+normalize :: String -> String
+normalize s = polynomialToString (normalizePolynomial (stringToPolynomial s))
 
 filterList :: Monomial -> Polynomial -> Polynomial
 filterList _ [] = []
@@ -114,7 +117,7 @@ findEqualMon x (y:ys)| varsOfMonomio x == varsOfMonomio y = (coefOfMonomio x + c
                     -- (3,[('x', 1)])  ------   [(2,[('x', 1)]), (3,[('',0)])]
 sumOfEqualMon :: Monomial -> Polynomial-> Int
 sumOfEqualMon x [] = coefOfMonomio x
-sumOfEqualMon x (y:ys)| (varsOfMonomio x == varsOfMonomio y) = coefOfMonomio y + sumOfEqualMon x ys
+sumOfEqualMon x (y:ys)| varsOfMonomio x == varsOfMonomio y = coefOfMonomio y + sumOfEqualMon x ys
                     | otherwise = sumOfEqualMon x ys
 
 notElement :: Monomial -> Polynomial -> Bool
@@ -127,12 +130,12 @@ notElement x (y:ys) | varsOfMonomio x == varsOfMonomio y = False
 {- multiplyPolynomial -}
 checkPower :: (Var, Power) -> [(Var, Power)] -> Bool
 checkPower x [] = False
-checkPower x (y:ys) | (fst x == fst y) = True
+checkPower x (y:ys) | fst x == fst y = True
                     | otherwise = checkPower x ys
 
 addPower :: (Var, Power) -> [(Var, Power)] -> [(Var, Power)]
 addPower x [] = [x]
-addPower x (y:ys) | (fst x == fst y) = (fst x, snd x + snd y) : ys
+addPower x (y:ys) | fst x == fst y = (fst x, snd x + snd y) : ys
                   | otherwise = y : addPower x ys
 
 addPowers :: [(Var, Power)] -> [(Var, Power)] -> [(Var, Power)]

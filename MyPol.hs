@@ -53,7 +53,7 @@ stringToExp (x:y:xs) = if y == '^' then (x, head (map digitToInt (take 1 xs)) ::
 stringToMonomial :: String -> Monomial
 stringToMonomial s | isDigit (head s) = (read (takeWhile isDigit s)::Int, stringToExp (dropWhile isDigit s))
                    | isLetter (head s) = (1, stringToExp s)
-                   | otherwise = (-1 * read (takeWhile isDigit (tail s))::Int, stringToExp (dropWhile isDigit (tail s)))
+                   | otherwise = (-1 * fst w, snd w) where w = stringToMonomial (tail s)
 
 stringToPolynomial :: String -> Polynomial
 stringToPolynomial s = map stringToMonomial (jointSignals (if head v == "" then tail v else v))

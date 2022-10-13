@@ -2,6 +2,7 @@ module MyPol where
 
 import Data.Char ( digitToInt, isLetter, isDigit )
 import Data.List.Split ( oneOf, split )
+import Data.List
 
 type Coef = Int
 type Power = Int
@@ -76,7 +77,26 @@ polynomialToString :: Polynomial -> String
 polynomialToString [] = ""
 polynomialToString [(c, xs)] = monomialToString (c, xs)
 polynomialToString ((c, xs):(k, zs):ys) = monomialToString (c, xs) ++ (if k<0 then " - " else " + ") ++ polynomialToString ((abs k, zs):ys)
-                                
+
+                   
+{- Sorting-}
+sortVariables :: [(Var, Power)] -> [(Var, Power)]
+sortVariables [] = []
+sortVariables xs = sortBy (\(x, y) (z, w) -> compare x z) xs
+
+sortMonomial :: Monomial -> Monomial
+sortMonomial (c, xs) = (c, sortVariables xs)
+
+sortPolynomial :: Polynomial -> Polynomial
+sortPolynomial [] = []
+sortPolynomial xs = sortBy (\(x, y) (z, w) -> compare y w) (map sortMonomial xs)
+
+{- Operations -}
+{- sort Polynomial -}
+
+{- sort Polynomial -}
+
+
 
 
 {- normalizePolynomial -}
@@ -98,8 +118,6 @@ addPolynomial x y = polynomialToString (addPolynomial2 p1 p2 ++ [d | d <- p2, no
                               p2 = stringToPolynomial y
 
 {-add Polynomial -}
---2xy + 3x + 4y + 5  ------ 2x + 3
---[(2,[('x', 1),('y', 1)]), (3,[('x', 1)]), (4,[('y', 1)]), (5,[]),] [(2,[('x', 1)]), (3,[])]
 addPolynomial2 :: Polynomial -> Polynomial -> Polynomial
 addPolynomial2 [] y = []
 addPolynomial2 (x:xs) ys = findEqualMon x ys : addPolynomial2 xs ys

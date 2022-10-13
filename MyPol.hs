@@ -22,6 +22,7 @@ opperations [] = []
 opperations [x] = []
 opperations (x:y:xs) = y : opperations xs
 
+
 {- Get coeficients and variables -}
 
 coefOfMonomio :: Monomial -> Int
@@ -93,6 +94,15 @@ filterList (c, xs) ((c1, xs1):ys) | xs == xs1 = filterList (c, xs) ys
                                   | otherwise = (c1, xs1) : filterList (c, xs) ys
 
 
+myclear :: [(Var,Power)] -> [(Var,Power)]
+myclear [] = []
+myclear ((v, p):xs) | p == 0 = myclear xs
+                    | otherwise = (v, p) : myclear xs
+
+cleanPolynomial :: Polynomial -> Polynomial
+cleanPolynomial [] = []
+cleanPolynomial ((c, v):ys) | c == 0 = cleanPolynomial ys
+                            | otherwise = (c,myclear v) : cleanPolynomial ys
 
 {- addPolynomials -}
 addPolynomial :: String -> String -> String

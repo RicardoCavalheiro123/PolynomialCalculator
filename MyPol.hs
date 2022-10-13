@@ -23,6 +23,7 @@ opperations [] = []
 opperations [x] = []
 opperations (x:y:xs) = y : opperations xs
 
+
 {- Get coeficients and variables -}
 
 coefOfMonomio :: Monomial -> Int
@@ -54,7 +55,7 @@ stringToExp (x:y:xs) = if y == '^' then (x, head (map digitToInt (take 1 xs)) ::
 stringToMonomial :: String -> Monomial
 stringToMonomial s | isDigit (head s) = (read (takeWhile isDigit s)::Int, stringToExp (dropWhile isDigit s))
                    | isLetter (head s) = (1, stringToExp s)
-                   | otherwise = (-1 * read (takeWhile isDigit (tail s))::Int, stringToExp (dropWhile isDigit (tail s)))
+                   | otherwise = (-1 * fst w, snd w) where w = stringToMonomial (tail s)
 
 stringToPolynomial :: String -> Polynomial
 stringToPolynomial s = map stringToMonomial (jointSignals (if head v == "" then tail v else v))
@@ -102,7 +103,10 @@ sortPolynomial xs = sortBy (\(x, y) (z, w) -> compare y w) (map sortMonomial xs)
 {- normalizePolynomial -}
 normalizePolynomial :: Polynomial -> Polynomial
 normalizePolynomial [] = []
-normalizePolynomial (x:xs) = [(sumOfEqualMon x xs, varsOfMonomio x)] ++ normalizePolynomial (filterList x xs)
+normalizePolynomial (x:xs) = (sumOfEqualMon x xs, varsOfMonomio x) : normalizePolynomial (filterList x xs)
+
+normalize :: String -> String
+normalize s = polynomialToString (normalizePolynomial (stringToPolynomial s))
 
 filterList :: Monomial -> Polynomial -> Polynomial
 filterList _ [] = []
@@ -110,6 +114,15 @@ filterList (c, xs) ((c1, xs1):ys) | xs == xs1 = filterList (c, xs) ys
                                   | otherwise = (c1, xs1) : filterList (c, xs) ys
 
 
+myclear :: [(Var,Power)] -> [(Var,Power)]
+myclear [] = []
+myclear ((v, p):xs) | p == 0 = myclear xs
+                    | otherwise = (v, p) : myclear xs
+
+cleanPolynomial :: Polynomial -> Polynomial
+cleanPolynomial [] = []
+cleanPolynomial ((c, v):ys) | c == 0 = cleanPolynomial ys
+                            | otherwise = (c,myclear v) : cleanPolynomial ys
 
 {- addPolynomials -}
 addPolynomial :: String -> String -> String
@@ -132,7 +145,7 @@ findEqualMon x (y:ys)| varsOfMonomio x == varsOfMonomio y = (coefOfMonomio x + c
                     -- (3,[('x', 1)])  ------   [(2,[('x', 1)]), (3,[('',0)])]
 sumOfEqualMon :: Monomial -> Polynomial-> Int
 sumOfEqualMon x [] = coefOfMonomio x
-sumOfEqualMon x (y:ys)| (varsOfMonomio x == varsOfMonomio y) = coefOfMonomio y + sumOfEqualMon x ys
+sumOfEqualMon x (y:ys)| varsOfMonomio x == varsOfMonomio y = coefOfMonomio y + sumOfEqualMon x ys
                     | otherwise = sumOfEqualMon x ys
 
 notElement :: Monomial -> Polynomial -> Bool
@@ -145,12 +158,12 @@ notElement x (y:ys) | varsOfMonomio x == varsOfMonomio y = False
 {- multiplyPolynomial -}
 checkPower :: (Var, Power) -> [(Var, Power)] -> Bool
 checkPower x [] = False
-checkPower x (y:ys) | (fst x == fst y) = True
+checkPower x (y:ys) | fst x == fst y = True
                     | otherwise = checkPower x ys
 
 addPower :: (Var, Power) -> [(Var, Power)] -> [(Var, Power)]
 addPower x [] = [x]
-addPower x (y:ys) | (fst x == fst y) = (fst x, snd x + snd y) : ys
+addPower x (y:ys) | fst x == fst y = (fst x, snd x + snd y) : ys
                   | otherwise = y : addPower x ys
 
 addPowers :: [(Var, Power)] -> [(Var, Power)] -> [(Var, Power)]

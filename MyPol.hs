@@ -92,12 +92,10 @@ sortPolynomial :: Polynomial -> Polynomial
 sortPolynomial [] = []
 sortPolynomial xs = sortBy (\(x, y) (z, w) -> compare y w) (map sortMonomial xs)
 
-{- Operations -}
-{- sort Polynomial -}
+{-Cleanu polunomial -> sort, nomalize and clean-}
 
-{- sort Polynomial -}
-
-
+cleanupPolynomialForOutput :: Polynomial -> Polynomial 
+cleanupPolynomialForOutput pol = cleanPolynomial(normalizePolynomial(sortPolynomial pol))
 
 
 {- normalizePolynomial -}
@@ -106,7 +104,7 @@ normalizePolynomial [] = []
 normalizePolynomial (x:xs) = (sumOfEqualMon x xs, varsOfMonomio x) : normalizePolynomial (filterList x xs)
 
 normalize :: String -> String
-normalize s = polynomialToString (normalizePolynomial (stringToPolynomial s))
+normalize s = polynomialToString (cleanupPolynomialForOutput(stringToPolynomial s))
 
 filterList :: Monomial -> Polynomial -> Polynomial
 filterList _ [] = []
@@ -124,16 +122,16 @@ cleanPolynomial [] = []
 cleanPolynomial ((c, v):ys) | c == 0 = cleanPolynomial ys
                             | otherwise = (c,myclear v) : cleanPolynomial ys
 
-{- addPolynomials -}
-addPolynomial :: String -> String -> String
-addPolynomial x y = polynomialToString (addPolynomial2 p1 p2 ++ [d | d <- p2, notElement d p1])
+{- add Polynomials by string -}
+addPolynomialString :: String -> String -> String
+addPolynomialString x y = polynomialToString (cleanupPolynomialForOutput(addPolynomial p1 p2 ++ [d | d <- p2, notElement d p1]))
                         where p1 = stringToPolynomial x
                               p2 = stringToPolynomial y
 
-{-add Polynomial -}
-addPolynomial2 :: Polynomial -> Polynomial -> Polynomial
-addPolynomial2 [] y = []
-addPolynomial2 (x:xs) ys = findEqualMon x ys : addPolynomial2 xs ys
+{-add Polynomials -}
+addPolynomial :: Polynomial -> Polynomial -> Polynomial
+addPolynomial [] y = []
+addPolynomial (x:xs) ys = findEqualMon x ys : addPolynomial xs ys
 
 
 -- (3,[('x', 1)])  ------   [(2,[('x', 1)]), (3,[('',0)])]
@@ -179,7 +177,7 @@ multiplyPolPol [] _ = []
 multiplyPolPol (x:xs) ys = multiplyMonPol x ys ++ multiplyPolPol xs ys
 
 multiplyPolynomial :: String -> String -> String
-multiplyPolynomial p1 p2 = polynomialToString (normalizePolynomial (multiplyPolPol (stringToPolynomial p1) (stringToPolynomial p2)))
+multiplyPolynomial p1 p2 = polynomialToString (cleanupPolynomialForOutput( multiplyPolPol (stringToPolynomial p1) (stringToPolynomial p2)))
 
 {- derivativePolynomial (Coef, [(Var, Power)]) -}
 
@@ -194,6 +192,6 @@ derivativePolynomial ((c, xs):ys) = derivativeMonomial (c, xs) : derivativePolyn
 
 {- derivative e.g. d/dx (x^2 + 2x + 1) = 2x + 2 -}
 derivative :: String -> String
-derivative s = polynomialToString (derivativePolynomial (stringToPolynomial s))
+derivative s = polynomialToString (cleanupPolynomialForOutput( derivativePolynomial (stringToPolynomial s)))
 
 

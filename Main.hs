@@ -19,7 +19,7 @@ main = do
       polinómio1 <- getLine
       putStrLn "Insira o segundo polinómio"
       polinómio2 <- getLine
-      putStrLn (MyPol.addPolynomial polinómio1 polinómio2)
+      putStrLn (MyPol.addPolynomialString polinómio1 polinómio2)
     else if opçao == "3" then do
       putStrLn "Insira o primeiro polinómio"
       polinómio1 <- getLine

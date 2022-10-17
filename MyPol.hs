@@ -1,3 +1,5 @@
+{-# OPTIONS_GHC -Wno-unrecognised-pragmas #-}
+{-# HLINT ignore "Use second" #-}
 module MyPol where
 
 import Data.Char ( digitToInt, isLetter, isDigit )
@@ -75,7 +77,7 @@ monomialToString (c, xs) = show c ++ varToString xs
 
 
 polynomialToString :: Polynomial -> String
-polynomialToString [] = ""
+polynomialToString [] = "0"
 polynomialToString [(c, xs)] = monomialToString (c, xs)
 polynomialToString ((c, xs):(k, zs):ys) = monomialToString (c, xs) ++ (if k<0 then " - " else " + ") ++ polynomialToString ((abs k, zs):ys)
 

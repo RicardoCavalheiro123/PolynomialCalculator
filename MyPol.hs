@@ -180,18 +180,25 @@ multiplyPolynomial :: String -> String -> String
 multiplyPolynomial p1 p2 = polynomialToString (cleanupPolynomialForOutput( multiplyPolPol (stringToPolynomial p1) (stringToPolynomial p2)))
 
 {- derivativePolynomial (Coef, [(Var, Power)]) -}
+derivativePower :: Char -> [(Var, Power)] -> ([(Var, Power)], Int)
+derivativePower c [] = ([], 0)
+derivativePower c ((v, p):xs) | c == v = (xs, p)
+                              | otherwise = let (ys, k) = derivativePower c xs in ((v, p):ys, k)
 
-derivativeMonomial :: Monomial -> Monomial
-derivativeMonomial (c, []) = (0, [])
-derivativeMonomial (c, xs) | snd (head xs) == 1 = (c * snd (head xs), tail xs)
-                           | otherwise = (c * snd (head xs), (fst (head xs), snd (head xs) - 1) : tail xs)
 
-derivativePolynomial :: Polynomial -> Polynomial
-derivativePolynomial [] = []
-derivativePolynomial ((c, xs):ys) = derivativeMonomial (c, xs) : derivativePolynomial ys
+derivativeMonomial :: Char -> Monomial -> Monomial
+derivativeMonomial v (0, xs) = (0, xs)
+derivativeMonomial v (c, []) = (0, [])
+derivativeMonomial v (c, xs) | v == fst (head xs) && 1 /= snd (head xs) = (c * snd (head xs),  (fst (head xs), snd (head xs) - 1):tail xs)
+                             | v == fst (head xs) && 1 == snd (head xs) = (c * snd (head xs),  (fst (head xs), snd (head xs) - 1):tail xs)
+                             | otherwise = (fst d, head xs : snd d) where d = derivativeMonomial v (c, tail xs)
+
+derivativePolynomial :: Char -> Polynomial -> Polynomial
+derivativePolynomial v [] = []
+derivativePolynomial v ((c, xs):ys) = derivativeMonomial v (c, xs) : derivativePolynomial v ys
 
 {- derivative e.g. d/dx (x^2 + 2x + 1) = 2x + 2 -}
-derivative :: String -> String
-derivative s = polynomialToString (cleanupPolynomialForOutput( derivativePolynomial (stringToPolynomial s)))
+derivative :: Char -> String -> String
+derivative v s = polynomialToString (cleanupPolynomialForOutput( derivativePolynomial   v (stringToPolynomial s)))
 
 

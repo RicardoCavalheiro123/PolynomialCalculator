@@ -97,7 +97,7 @@ sortPolynomial xs = sortBy (\(x, y) (z, w) -> compare y w) (map sortMonomial xs)
 {-Cleanu polunomial -> sort, nomalize and clean-}
 
 cleanupPolynomialForOutput :: Polynomial -> Polynomial 
-cleanupPolynomialForOutput pol = cleanPolynomial(normalizePolynomial(sortPolynomial pol))
+cleanupPolynomialForOutput pol = reverse (cleanPolynomial(normalizePolynomial(sortPolynomial pol)))
 
 
 {- normalizePolynomial -}
@@ -107,6 +107,13 @@ normalizePolynomial (x:xs) = (sumOfEqualMon x xs, varsOfMonomio x) : normalizePo
 
 normalize :: String -> String
 normalize s = polynomialToString (cleanupPolynomialForOutput(stringToPolynomial s))
+
+{-normalize Polynomials with internal representation-}
+
+normalizeInternal :: Polynomial -> Polynomial
+normalizeInternal = cleanupPolynomialForOutput
+
+{- sumOfEqualMon -}
 
 filterList :: Monomial -> Polynomial -> Polynomial
 filterList _ [] = []
@@ -124,11 +131,15 @@ cleanPolynomial [] = []
 cleanPolynomial ((c, v):ys) | c == 0 = cleanPolynomial ys
                             | otherwise = (c,myclear v) : cleanPolynomial ys
 
-{- add Polynomials by string -}
+{-add Polynomials by string -}
 addPolynomialString :: String -> String -> String
 addPolynomialString x y = polynomialToString (cleanupPolynomialForOutput(addPolynomial p1 p2 ++ [d | d <- p2, notElement d p1]))
                         where p1 = stringToPolynomial x
                               p2 = stringToPolynomial y
+{-add Polynomials with internal representation-}
+addPolynomialsInternal:: Polynomial ->  Polynomial ->  Polynomial
+addPolynomialsInternal x y = cleanupPolynomialForOutput(addPolynomial x y ++ [d | d <- y, notElement d x])
+
 
 {-add Polynomials -}
 addPolynomial :: Polynomial -> Polynomial -> Polynomial
@@ -136,13 +147,12 @@ addPolynomial [] y = []
 addPolynomial (x:xs) ys = findEqualMon x ys : addPolynomial xs ys
 
 
--- (3,[('x', 1)])  ------   [(2,[('x', 1)]), (3,[('',0)])]
 findEqualMon :: Monomial -> Polynomial-> Monomial
 findEqualMon x [] = x
 findEqualMon x (y:ys)| varsOfMonomio x == varsOfMonomio y = (coefOfMonomio x + coefOfMonomio y, varsOfMonomio x)
                     | otherwise = findEqualMon x ys
 
-                    -- (3,[('x', 1)])  ------   [(2,[('x', 1)]), (3,[('',0)])]
+                    
 sumOfEqualMon :: Monomial -> Polynomial-> Int
 sumOfEqualMon x [] = coefOfMonomio x
 sumOfEqualMon x (y:ys)| varsOfMonomio x == varsOfMonomio y = coefOfMonomio y + sumOfEqualMon x ys
@@ -177,6 +187,13 @@ multiplyMonPol (c1, xs1) ((c2, xs2):ys) = (c1 * c2, addPowers xs1 xs2) : multipl
 multiplyPolPol :: Polynomial -> Polynomial -> Polynomial
 multiplyPolPol [] _ = []
 multiplyPolPol (x:xs) ys = multiplyMonPol x ys ++ multiplyPolPol xs ys
+
+{-multiplying Polynomials with internal representation-}
+
+multiplyPolynomialInternal :: Polynomial -> Polynomial -> Polynomial
+multiplyPolynomialInternal p1 p2 = cleanupPolynomialForOutput(multiplyPolPol  p1 p2)
+
+{-multiplying Polynomials by string-}
 
 multiplyPolynomial :: String -> String -> String
 multiplyPolynomial p1 p2 = polynomialToString (cleanupPolynomialForOutput( multiplyPolPol (stringToPolynomial p1) (stringToPolynomial p2)))

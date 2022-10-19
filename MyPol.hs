@@ -108,7 +108,7 @@ sortPolynomial xs = sortBy (\(x, y) (z, w) -> compare y w) (map sortMonomial xs)
 
 {-Clean polynomial -> sort, nomalize and clean-}
 cleanupPolynomialForOutput :: Polynomial -> Polynomial 
-cleanupPolynomialForOutput pol = cleanPolynomial(normalizePolynomial(sortPolynomial pol))
+cleanupPolynomialForOutput pol = reverse (cleanPolynomial(normalizePolynomial(sortPolynomial pol)))
 
 
 {- normalizePolynomial -}
@@ -122,6 +122,13 @@ normalize s = polynomialToString (cleanupPolynomialForOutput(stringToPolynomial 
 
 
 -- TODO comment
+{-normalize Polynomials with internal representation-}
+
+normalizeInternal :: Polynomial -> Polynomial
+normalizeInternal = cleanupPolynomialForOutput
+
+{- sumOfEqualMon -}
+
 filterList :: Monomial -> Polynomial -> Polynomial
 filterList _ [] = []
 filterList (c, xs) ((c1, xs1):ys) | xs == xs1 = filterList (c, xs) ys
@@ -147,6 +154,12 @@ addPol :: String -> String -> String
 addPol x y = polynomialToString (cleanupPolynomialForOutput(addPolynomial p1 p2 ++ [d | d <- p2, notElement d p1]))
                         where p1 = stringToPolynomial x
                               p2 = stringToPolynomial y
+
+                              
+{-add Polynomials with internal representation-}
+addPolynomialsInternal:: Polynomial ->  Polynomial ->  Polynomial
+addPolynomialsInternal x y = cleanupPolynomialForOutput(addPolynomial x y ++ [d | d <- y, notElement d x])
+
 
 
 {-add Polynomials -}
@@ -208,11 +221,15 @@ multiplyPolPol :: Polynomial -> Polynomial -> Polynomial
 multiplyPolPol [] _ = []
 multiplyPolPol (x:xs) ys = multiplyMonPol x ys ++ multiplyPolPol xs ys
 
+{-multiplying Polynomials with internal representation-}
 
--- multiply polynomials  -- ready for input and output 
+multiplyPolynomialInternal :: Polynomial -> Polynomial -> Polynomial
+multiplyPolynomialInternal p1 p2 = cleanupPolynomialForOutput(multiplyPolPol  p1 p2)
+
+{-multiplying Polynomials by string-}
+
 multiplyPol :: String -> String -> String
 multiplyPol p1 p2 = polynomialToString (cleanupPolynomialForOutput( multiplyPolPol (stringToPolynomial p1) (stringToPolynomial p2)))
-
 
 {- derivativePolynomial (Coef, [(Var, Power)]) -}
 -- derivative of the powers of monomial

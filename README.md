@@ -8,21 +8,25 @@
 
 2. Then load the main file:
 
-```:l src/Main.hs```
+```:l Main.hs```
 
-3. Then run the main function:
+ Then run the main function:
 
 ```:main```
 
- 3. or choose from various other functions:
+ 3. or load the MyPol.hs file:
+ 
+```:l MyPol.hs```
 
-```:derivative 'x' '3x'```
+    Then run the following functions:
 
-```:multiplyPol '3x' '2y'```
+```derivative 'x' '3x'```
 
-```:normalize '3x +2x + 4y'```
+```multiplyPol '3x' '2y'```
 
-```:addPol '3x' '2y'```
+```normalize '3x +2x + 4y'```
+
+```addPol '3x' '2y'```
 
 ## Internal Polynomial structure
 
@@ -31,15 +35,25 @@ Therefore our monomial is a structure where the first element is the coeficient 
 
 ## Short description of each function
 
-### Normalize
+#### __Normalize__
 
-### Add
+#### __Add__
 
-### Multiply
+#### __Multiply__
 The multiply function takes two polynomials and multiplies them together. It does this by multiplying each monomial of the first polynomial with the second polynomial. It then adds the results together.
 
-### Derivative
+#### __Derivative__
 The derivative function, iterates through the polynomial and derivates each monomial. To differenciate a monomial, we multiply the coeficient with the power and then subtract 1 from the power. If the coeficient is 0, we remove the monomial from the polynomial, through the normalize function. 
+
+## Testing
+To run the tests, run the following command in the root directory of the project:
+
+```testing```
+
+after loading the main file:
+
+```:l Main.hs```
+
 
 ### Authors
 

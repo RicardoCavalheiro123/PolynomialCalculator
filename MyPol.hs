@@ -5,6 +5,7 @@ module MyPol where
 import Data.Char ( digitToInt, isLetter, isDigit )
 import Data.List.Split ( oneOf, split )
 import Data.List ( sortBy )
+import Test.QuickCheck
 
 {- Internal structure -}
 type Coef = Int
@@ -109,8 +110,7 @@ sortPolynomial xs = sortBy (\(x, y) (z, w) -> compare y w) (map sortMonomial xs)
 {-Clean polynomial -> sort, nomalize and clean-}
 cleanupPolynomialForOutput :: Polynomial -> Polynomial 
 
-cleanupPolynomialForOutput pol = reverse (cleanPolynomial(normalizePolynomial(sortPolynomial pol)))
-
+cleanupPolynomialForOutput pol = reverse (sortPolynomial(normalizePolynomial(cleanPolynomial(sortPolynomial pol))))
 
 {- normalizePolynomial -}
 normalizePolynomial :: Polynomial -> Polynomial
@@ -126,7 +126,7 @@ normalize s = polynomialToString (cleanupPolynomialForOutput(stringToPolynomial 
 {-normalize Polynomials with internal representation-}
 
 normalizeInternal :: Polynomial -> Polynomial
-normalizeInternal = cleanupPolynomialForOutput
+normalizeInternal p = cleanupPolynomialForOutput p
 
 {- sumOfEqualMon -}
 
@@ -146,8 +146,18 @@ myclear ((v, p):xs) | p == 0 = myclear xs
 -- TODO comment
 cleanPolynomial :: Polynomial -> Polynomial
 cleanPolynomial [] = []
-cleanPolynomial ((c, v):ys) | c == 0 = cleanPolynomial ys
-                            | otherwise = (c,myclear v) : cleanPolynomial ys
+cleanPolynomial ((c, v):ys) | c == 0 = cleanPolynomial (ys)
+                            | otherwise = (c,myclear (joinVars v)) : cleanPolynomial ys
+
+-- [(1,[('`',1),('A',1),('`',1)])] 
+
+
+
+joinVars :: [(Var, Power)] -> [(Var, Power)]
+joinVars [] = []
+joinVars ((v,p):xs) = if(checkPower (v,p) xs) then joinVars (map (\x -> if fst x == v then (v, p+ snd x) else x) xs)
+                      else (v,p) : joinVars xs
+
 
 
 {- add Polynomials by string -}
@@ -253,9 +263,19 @@ derivativeMonomial v (c, xs) | v == fst (head xs) = (c * snd (head xs),  (fst (h
 -- derivative of polynomial
 derivativePolynomial :: Char -> Polynomial -> Polynomial
 derivativePolynomial v [] = []
-derivativePolynomial v ((c, xs):ys) = derivativeMonomial v (c, xs) : derivativePolynomial v ys
+derivativePolynomial v ((c, xs):ys) = cleanupPolynomialForOutput(derivativeMonomial v (c, xs) : derivativePolynomial v ys)
 
 
 {- derivative e.g. d/dx (x^2 + 2x + 1) = 2x + 2 -} -- ready for input and output
 derivative :: Char -> String -> String
-derivative v s = polynomialToString (cleanupPolynomialForOutput( derivativePolynomial   v (stringToPolynomial s)))
+derivative v s = polynomialToString ( derivativePolynomial   v (stringToPolynomial s))
+
+
+prop :: Polynomial -> Bool
+prop p = addPolynomialsInternal p p == normalizeInternal (p++p)
+
+prop_multiply :: Polynomial -> Polynomial -> Bool
+prop_multiply p1 p2 = multiplyPolynomialInternal p1 p2 == multiplyPolynomialInternal p2 p1
+
+prop_derivative :: Polynomial -> Bool
+prop_derivative p = derivativePolynomial 'x' p == derivativePolynomial 'x' (reverse p)

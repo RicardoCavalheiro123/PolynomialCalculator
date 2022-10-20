@@ -13,7 +13,7 @@ main = do
     if opçao == "1" then do
       putStrLn "Insira o polinómio"
       polinómio <- getLine
-      putStrLn (MyPol.polynomialToString (MyPol.normalizePolynomial (MyPol.stringToPolynomial polinómio)))
+      putStrLn (MyPol.normalize polinómio)
     else if opçao == "2" then do
       putStrLn "Insira o primeiro polinómio"
       polinómio1 <- getLine
@@ -29,8 +29,10 @@ main = do
     else if opçao == "4" then do
       putStrLn "Insira o polinómio"
       polinómio <- getLine
+      putStrLn "Insira variavel a derivar"
+      var <- getChar
       putStrLn "Por fazer"
-      --putStrLn (MyPol.polynomialToString (MyPol.derivativePolynomial (MyPol.stringToPolynomial polinómio)))
+      putStrLn (MyPol.derivative var polinómio)
     else putStrLn "Wrong number"
 
 {-Testing-}

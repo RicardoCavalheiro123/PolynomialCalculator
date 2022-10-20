@@ -108,6 +108,7 @@ sortPolynomial xs = sortBy (\(x, y) (z, w) -> compare y w) (map sortMonomial xs)
 
 {-Clean polynomial -> sort, nomalize and clean-}
 cleanupPolynomialForOutput :: Polynomial -> Polynomial 
+
 cleanupPolynomialForOutput pol = reverse (cleanPolynomial(normalizePolynomial(sortPolynomial pol)))
 
 

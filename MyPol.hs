@@ -158,7 +158,9 @@ addPol x y = polynomialToString (cleanupPolynomialForOutput(addPolynomial p1 p2 
                               
 {-add Polynomials with internal representation-}
 addPolynomialsInternal:: Polynomial ->  Polynomial ->  Polynomial
-addPolynomialsInternal x y = cleanupPolynomialForOutput(addPolynomial x y ++ [d | d <- y, notElement d x])
+addPolynomialsInternal x y = cleanupPolynomialForOutput(addPolynomial p1 p2 ++ [d | d <- p2, notElement d p1])
+                             where p1 = normalizeInternal x
+                                   p2 = normalizeInternal y
 
 
 
@@ -224,7 +226,7 @@ multiplyPolPol (x:xs) ys = multiplyMonPol x ys ++ multiplyPolPol xs ys
 {-multiplying Polynomials with internal representation-}
 
 multiplyPolynomialInternal :: Polynomial -> Polynomial -> Polynomial
-multiplyPolynomialInternal p1 p2 = cleanupPolynomialForOutput(multiplyPolPol  p1 p2)
+multiplyPolynomialInternal p1 p2 = cleanupPolynomialForOutput(multiplyPolPol  (normalizeInternal p1) (normalizeInternal p2))
 
 {-multiplying Polynomials by string-}
 

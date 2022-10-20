@@ -1,6 +1,13 @@
 module Main where
 
-import qualified MyPol
+import MyPol
+    ( addPol,
+      addPolynomialsInternal,
+      derivative,
+      multiplyPol,
+      multiplyPolynomialInternal,
+      normalize,
+      normalizeInternal )
 
 main :: IO ()
 main = do

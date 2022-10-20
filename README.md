@@ -54,6 +54,17 @@ after loading the main file:
 
 ```:l Main.hs```
 
+## Dependencies
+
+Needed packages to run our program:
+
+Quick Check:
+```cabal install QuickCheck```
+```cabal install --lib QuickCheck```
+```:set -package QuickCheck```
+
+
+
 
 ### Authors
 

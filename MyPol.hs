@@ -153,8 +153,8 @@ cleanPolynomial ((c, v):ys) | c == 0 = cleanPolynomial ys
 {- add Polynomials by string -}
 addPol :: String -> String -> String
 addPol x y = polynomialToString (cleanupPolynomialForOutput(addPolynomial p1 p2 ++ [d | d <- p2, notElement d p1]))
-                        where p1 = stringToPolynomial x
-                              p2 = stringToPolynomial y
+                        where p1 = normalizeInternal (stringToPolynomial x)
+                              p2 = normalizeInternal (stringToPolynomial y)
 
                               
 {-add Polynomials with internal representation-}

@@ -18,7 +18,6 @@ arbitrarySizedPolynomial m = do
     power <- choose (0, 9999)
     return (Polynomial [(coef, [(var, power)])])
 -}
+
 prop :: Polynomial -> Polynomial -> Bool
 prop a b = addPol (polynomialToString a) (polynomialToString b) == addPol (polynomialToString b) (polynomialToString a)
-
-

@@ -5,10 +5,11 @@ module MyPol where
 import Data.Char ( digitToInt, isLetter, isDigit )
 import Data.List.Split ( oneOf, split )
 import Data.List ( sortBy )
+import Test.QuickCheck ( NonNegative )
 
 {- Internal structure -}
 type Coef = Int
-type Power = Int
+type Power =   Int
 type Var = Char
 
 type Monomial = (Coef, [(Var, Power)]) -- (Int, [(Char, Int)])

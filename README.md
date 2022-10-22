@@ -14,11 +14,7 @@
 
 ```:main```
 
- 3. or load the MyPol.hs file:
- 
-```:l MyPol.hs```
-
-    Then run the following functions:
+ 3. or run the following functions:
 
 ```derivative 'x' '3x'```
 

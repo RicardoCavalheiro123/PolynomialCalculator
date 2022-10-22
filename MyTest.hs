@@ -16,20 +16,6 @@ import MyPol
   )
 import Test.QuickCheck
 
-{-
-data PolTest a = Polynomial a
-
-instance Arbitrary a => Arbitrary (Polynomial a) where
-    arbitrary =
-        sized arbitrarySizedPolynomial
-
-arbitrarySizedPolynomial :: Arbitrary a => Int -> Gen (Polynomial a)
-arbitrarySizedPolynomial m = do
-    coef <- arbitrary
-    power <- choose (0, 9999)
-    return (Polynomial [(coef, [(var, power)])])
--}
-
 prop_add :: Polynomial -> Bool
 prop_add p = addPolynomialsInternal p p == normalizeInternal (p ++ p)
 

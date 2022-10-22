@@ -50,9 +50,13 @@ To run the tests, run the following command in the root directory of the project
 
 ```testing```
 
-after loading the main file:
+after loading the MyTest.hs file:
 
-```:l Main.hs```
+```:l MyTest.hs```
+
+or run for the quickcheck tests by running:
+
+```quickCheck prop```
 
 ## Dependencies
 

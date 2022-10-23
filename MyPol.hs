@@ -271,11 +271,15 @@ derivative :: Char -> String -> String
 derivative v s = polynomialToString ( derivativePolynomial   v (stringToPolynomial s))
 
 
-prop :: Polynomial -> Bool
-prop p = addPolynomialsInternal p p == normalizeInternal (p++p)
+prop_add_norm :: Polynomial -> Bool
+prop_add_norm p = addPolynomialsInternal p p == normalizeInternal (p++p)
 
 prop_multiply :: Polynomial -> Polynomial -> Bool
 prop_multiply p1 p2 = multiplyPolynomialInternal p1 p2 == multiplyPolynomialInternal p2 p1
 
 prop_derivative :: Polynomial -> Bool
 prop_derivative p = derivativePolynomial 'x' p == derivativePolynomial 'x' (reverse p)
+
+prop_filterList :: Monomial -> Polynomial -> Bool
+prop_filterList x y = if (notElement x y) then length(filterList x y) == length y
+            else length (filterList x y) < length y

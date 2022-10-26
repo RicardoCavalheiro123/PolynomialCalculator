@@ -16,13 +16,13 @@
 
  3. or run the following functions:
 
-```derivative 'x' '3x'```
+```derivative 'x' "3x"```
 
-```multiplyPol '3x' '2y'```
+```multiplyPol "3x" "2y"```
 
-```normalize '3x +2x + 4y'```
+```normalize "3x +2x + 4y"```
 
-```addPol '3x' '2y'```
+```addPol "3x" "2y"```
 
 ## Internal Polynomial structure
 

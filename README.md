@@ -1,4 +1,4 @@
-# PFL T2G06
+# Polynomial Calculator
 ## Haskell Programming (First project work)
 
 ## Getting started
